@@ -3,8 +3,56 @@
     justify-content: space-between;
     background-color: grey;
     padding: 10px;
+    top: 0;
 }
 
-#start_ui {
-    
+.ui {
+    display: none;
+    padding: 50px;
+    margin: 100px;
+    text-align: center;
+    border: 1px solid black;
+    background-color: #f1f1f1;
+    font-size: x-large;
+    z-index: 99;
+}
+
+#game {
+    border: 1px solid black;
+}
+
+/* .gameover_ui {
+    display: none;
+}
+
+.start_ui {
+    display: none;
+} */
+
+/* #game {
+    display: none;
+} */
+
+#ui_title, #ui_game_over {
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+/* #gameover_ui {
+    display: none;
+} */
+
+#gameover_stats {
+    background-color: grey;
+    padding: 10px;
+
+}
+
+#startbtn, #restartbtn {
+    padding: 10px;
+    font-size: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
 }
