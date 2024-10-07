@@ -5,7 +5,7 @@
 ![alt text](start.png)
 
 ### In-Game Page
-![alt text](in-game.png)
+![alt text](ingame.png)
 
 ### Game Over Page
 ![alt text](gameover.png)
@@ -37,7 +37,7 @@
     * Displayed at the top of the screen that shows the player's stats:
         * Score (Points)
         * Time Survived
-        * Player Health (Lives <3 <3)
+        * Player Health (Lives <3)
         * Speed level
 
 

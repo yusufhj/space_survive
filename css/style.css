@@ -1,0 +1,10 @@
+#stats {
+    display: flex;
+    justify-content: space-between;
+    background-color: grey;
+    padding: 10px;
+}
+
+#start_ui {
+    
+}

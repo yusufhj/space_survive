@@ -8,6 +8,38 @@
     <script defer src="/js/app.js"></script>
 </head>
 <body>
-    
+    <nav id="stats">
+        <div id="stat_lives">Lives: 1</div>
+        <div id="stat_speed">Speed: 1x</div>
+        <div id="stat_time">Time: 00:00</div>
+        <div id="stat_score">Score: 0</div>
+    </nav>
+    <main>
+        <div id="game_ui">
+            <div id="game">
+                <canvas id="game_canvas" width="800" height="600"></canvas>
+            </div>
+
+            <div id="start_ui">
+                <button id="ui_start">START GAME</button>
+            </div>
+
+            <div id="game_over_ui">
+                <div id="ui_game_over">GAME OVER</div>
+                <!-- <div id="ui_game_over_highscore">Your Highscore: 0</div> -->
+                <div id="ui_game_over_score">Score: 0</div>
+                <div id="ui_game_over_time">Time: 00:00</div>
+                <div id="ui_game_over_lives">
+                    Lives: 1
+                    <button id="upgrade_lives_btn"></button>
+                </div>
+                <div id="ui_game_over_speed">
+                    Speed: 1x 
+                    <button id="upgrade_speed_btn"></button>
+                </div>
+                <button id="ui_restart">PLAY AGAIN</button>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
