@@ -8,7 +8,7 @@
 ![alt text](ingame.png)
 
 ### Game Over Page
-![alt text](gameover.png)
+![alt text](over.png)
 
 
 ## USER STORIES
