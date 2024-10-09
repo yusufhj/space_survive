@@ -18,15 +18,10 @@ const playerObj = {
 
 const gameObj = {
     numOfEnemies: 1,
-    enemiesPos: {
-        x: [Math.random() * window.innerWidth - 150],
-        y: [Math.random() * window.innerHeight - 150]
-    },
+    enemiesPos: [{ x: 0, y: 0 }],
     shootingInterval: 1000,
     enemySpeed: 1,
     enemySpawnInterval: 5000,
-    enemySpawnRate: 1,
-    enemyLaserSpeed: 5,
     lasers: []
 }
 
@@ -34,6 +29,12 @@ const gameObj = {
 /*---------- Variables (state) ---------*/
 
 let gameInterval;
+let mouseX = 0;
+let mouseY = 0;
+var player = new Image();
+player.src = '/assets/player.png';
+var enemy = new Image();
+enemy.src = '/assets/spaceship.png';
 
 /*----- Cached Element References  -----*/
 
@@ -75,40 +76,15 @@ function drawCanvas() {
 
 // draw player
 function drawPlayer() {
-    var player = new Image();
-    player.src = '/assets/player.png';
-    player.onload = function() {
-        ctx.drawImage(player, playerObj.pos.x, playerObj.pos.y, 50, 50);
-    }
+    ctx.drawImage(player, playerObj.pos.x, playerObj.pos.y, 20, 20);
 }
 
 // draw enemies
 function drawEnemies() {
-    var enemy = new Image();
-    enemy.src = '/assets/spaceship.png';
-    enemy.onload = function() {
-        for (let i = 0; i < gameObj.numOfEnemies; i++) {
-            ctx.drawImage(enemy, gameObj.enemiesPos.x[i], gameObj.enemiesPos.y[i], 150, 150);
-        }
+    for (let enemyPos of gameObj.enemiesPos) {
+        ctx.drawImage(enemy, enemyPos.x, enemyPos.y, 50, 50);
     }
 }
-
-// move enemies
-function moveEnemies() {
-    for (let i = 0; i < gameObj.numOfEnemies; i++) {
-        const enemySpeed = gameObj.enemySpeed;
-        const dx = playerObj.pos.x - gameObj.enemiesPos.x[i];
-        const dy = playerObj.pos.y - gameObj.enemiesPos.y[i];
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance > 0) {
-            gameObj.enemiesPos.x[i] += (dx / distance) * enemySpeed;
-            gameObj.enemiesPos.y[i] += (dy / distance) * enemySpeed;
-        }
-    }
-}
-
-
 
 /*-------------- Functions -------------*/
 
@@ -116,6 +92,9 @@ function moveEnemies() {
 function init() {
     updateStats();
     render();
+
+    setInterval(moveEnemies, 50);
+    setInterval(spawnEnemies, gameObj.enemySpawnInterval);
 }
 
 // render
@@ -125,6 +104,38 @@ function render() {
     drawEnemies();
     // render enemies
     drawPlayer();
+}
+
+// move enemies
+function moveEnemies() {
+    for (let i = 0; i < gameObj.numOfEnemies; i++) {
+        const enemySpeed = gameObj.enemySpeed;
+        const dx = playerObj.pos.x - gameObj.enemiesPos[i].x;
+        const dy = playerObj.pos.y - gameObj.enemiesPos[i].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 0) {
+            gameObj.enemiesPos[i].x += (dx / distance) * enemySpeed;
+            gameObj.enemiesPos[i].y += (dy / distance) * enemySpeed;
+        }
+    }
+}
+
+// spawn enemies
+function generateEnemyPosition() {
+    let enemyX, enemyY;
+    do {
+        enemyX = Math.random() * (canvas.width - 150);
+        enemyY = Math.random() * (canvas.height - 150);
+    } while (Math.abs(enemyX - playerObj.pos.x) < 100 && Math.abs(enemyY - playerObj.pos.y) < 100);
+    
+    return { x: enemyX, y: enemyY };
+}
+
+function spawnEnemies() {
+    const newEnemyPosition = generateEnemyPosition();
+    gameObj.enemiesPos.push(newEnemyPosition);
+    gameObj.numOfEnemies++;
 }
 
 // update stats
@@ -146,6 +157,7 @@ function updateStats() {
         timeStat.textContent = "Time: " + playerObj.timeSurvived.seconds.toString() + "s";
     }
     scoreStat.textContent = "Score: " + playerObj.score;
+
     checkCollision();
 
     if (playerObj.score >= 1) {
@@ -171,10 +183,10 @@ function endGame() {
 function checkCollision() {
     // if player hits enemy ship
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
-        if (playerObj.pos.x < gameObj.enemiesPos.x[i] + 150 && 
-            playerObj.pos.x + 50 > gameObj.enemiesPos.x[i] && 
-            playerObj.pos.y < gameObj.enemiesPos.y[i] + 150 && 
-            playerObj.pos.y + 50 > gameObj.enemiesPos.y[i]) {
+        if (playerObj.pos.x < gameObj.enemiesPos[i].x + 150 && 
+            playerObj.pos.x + 40 > gameObj.enemiesPos[i].x && 
+            playerObj.pos.y < gameObj.enemiesPos[i].y + 150 && 
+            playerObj.pos.y + 40 > gameObj.enemiesPos[i].y) {
                 if (playerObj.lives > 0) {
                     playerObj.lives -= 1;
                 } else {
@@ -189,9 +201,23 @@ function checkCollision() {
 
 canvas.addEventListener('mousemove', function(e) {
     var rect = canvas.getBoundingClientRect();
+    
+    // Calculate new player position
+    let newX = e.clientX - rect.left - 25;
+    let newY = e.clientY - rect.top - 25;
+    
+    // Constrain player within canvas
+    const shipWidth = 50;  
+    const shipHeight = 50; 
+    
+    if (newX < 0) newX = 0;
+    if (newX + shipWidth > canvas.width) newX = canvas.width - shipWidth;
+    if (newY < 0) newY = 0;
+    if (newY + shipHeight > canvas.height) newY = canvas.height - shipHeight;
 
-    playerObj.pos.x = e.clientX - rect.left - 25;
-    playerObj.pos.y = e.clientY - rect.top - 25;
+    // Update player position
+    playerObj.pos.x = newX;
+    playerObj.pos.y = newY;
 
     render();
 });
@@ -207,6 +233,7 @@ startbtn.addEventListener('click', function() {
     gameInterval = setInterval(function() {
         playerObj.timeSurvived.seconds += 1;
         updateStats();
+        moveEnemies();
     }, 1000);
 
     // initailize game
@@ -226,19 +253,20 @@ restartbtn.addEventListener('click', function() {
     playerObj.score = SCORE = 0;
     playerObj.timeSurvived.seconds = 0;
     playerObj.timeSurvived.minutes = 0;
+
     gameObj.numOfEnemies = 1;
-    gameObj.enemiesPos.x = [Math.random() * window.innerWidth];
-    gameObj.enemiesPos.y = [Math.random() * window.innerHeight];
+    gameObj.enemiesPos = [{x: 0, y: 0}];
+    spawnEnemies();
 
     // restart the game
-    clearInterval(gameInterval);  // Ensure old intervals are cleared
+    clearInterval(gameInterval); 
     gameInterval = setInterval(function() {
         playerObj.timeSurvived.seconds += 1;
         updateStats();
+        moveEnemies();
     }, 1000);
 
     init();
-
 });
 
 
