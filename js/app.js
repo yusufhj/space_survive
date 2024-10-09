@@ -32,9 +32,9 @@ let gameInterval;
 let mouseX = 0;
 let mouseY = 0;
 var player = new Image();
-player.src = './assets/player.png';
+player.src = '/assets/player.png';
 var enemy = new Image();
-enemy.src = './assets/spaceship.png';
+enemy.src = '/assets/spaceship.png';
 
 /*----- Cached Element References  -----*/
 
