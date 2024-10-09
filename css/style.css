@@ -1,58 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+    /* background-image: url('../assets/bg.gif'); */
+    background-image: url('/assets/bgbk.jpg');
+    background-size: cover;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+
 #stats {
     display: flex;
     justify-content: space-between;
-    background-color: grey;
     padding: 10px;
     top: 0;
+    color: white;
 }
 
 .ui {
-    display: none;
+    /* display: none; */
     padding: 50px;
     margin: 100px;
     text-align: center;
     border: 1px solid black;
-    background-color: #f1f1f1;
+    background-color: rgba(136, 136, 136, 0.5);
     font-size: x-large;
     z-index: 99;
 }
 
+#game canvas {
+    background-color: rgba(59, 55, 63, 0.5);
+}
+
+#gameover_img {
+    width: 400px;
+}
+
+.gameover_ui {
+    display: none;
+}
+
+/* .start_ui {
+    display: none;
+} */
+
 #game {
-    border: 1px solid black;
-}
-
-/* .gameover_ui {
     display: none;
 }
-
-.start_ui {
-    display: none;
-} */
-
-/* #game {
-    display: none;
-} */
 
 #ui_title, #ui_game_over {
-    font-size: xx-large;
+    font-size: 60px;
     font-weight: bold;
+    padding: 10px;
 }
 
-/* #gameover_ui {
-    display: none;
-} */
-
 #gameover_stats {
-    background-color: grey;
+    background-color: rgba(59, 55, 63, 0.5);
     padding: 10px;
 
 }
 
 #startbtn, #restartbtn {
+    font-family: "Press Start 2P", system-ui;
     padding: 10px;
     font-size: 20px;
-    background-color: #4CAF50;
+    background-color: #839384;
     color: white;
     border: none;
     cursor: pointer;
+}
+
+#startbtn:hover, #restartbtn:hover {
+    background-color: #6b6f6b;
+}
+
+#start_description {
+    font-size: large;
+    font-weight: bold;
+    padding: 20px;
 }
