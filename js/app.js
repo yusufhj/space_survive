@@ -1,9 +1,11 @@
 /*-------------- Constants -------------*/
-const MAX_LIVES = 99
+
+let LIVES = 1; 
+let SCORE = 0;
 
 const playerObj = {
-    lives: 1,
-    score: 0,
+    lives: LIVES,
+    score: SCORE,
     timeSurvived: {
         seconds: 0,
         minutes: 0
@@ -17,19 +19,21 @@ const playerObj = {
 const gameObj = {
     numOfEnemies: 1,
     enemiesPos: {
-        x: [Math.random() * window.innerWidth],
-        y: [Math.random() * window.innerHeight]
+        x: [Math.random() * window.innerWidth - 150],
+        y: [Math.random() * window.innerHeight - 150]
     },
     shootingInterval: 1000,
     enemySpeed: 1,
     enemySpawnInterval: 5000,
-    enemySpawnRate: 1
+    enemySpawnRate: 1,
+    enemyLaserSpeed: 5,
+    lasers: []
 }
 
 
 /*---------- Variables (state) ---------*/
 
-
+let gameInterval;
 
 /*----- Cached Element References  -----*/
 
@@ -49,7 +53,6 @@ const scoreStat = document.querySelector('#stat_score');
 const gameoverScoreStat = document.querySelector('#ui_game_over_score');
 const gameoverTimeStat = document.querySelector('#ui_game_over_time');
 const gameoverLivesStat = document.querySelector('#ui_game_over_lives');
-
 
 // elements
 const startEl = document.querySelector('#start_ui');
@@ -90,6 +93,23 @@ function drawEnemies() {
     }
 }
 
+// move enemies
+function moveEnemies() {
+    for (let i = 0; i < gameObj.numOfEnemies; i++) {
+        const enemySpeed = gameObj.enemySpeed;
+        const dx = playerObj.pos.x - gameObj.enemiesPos.x[i];
+        const dy = playerObj.pos.y - gameObj.enemiesPos.y[i];
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 0) {
+            gameObj.enemiesPos.x[i] += (dx / distance) * enemySpeed;
+            gameObj.enemiesPos.y[i] += (dy / distance) * enemySpeed;
+        }
+    }
+}
+
+
+
 /*-------------- Functions -------------*/
 
 // initailize game
@@ -127,58 +147,42 @@ function updateStats() {
     }
     scoreStat.textContent = "Score: " + playerObj.score;
     checkCollision();
-    if (playerObj.lives === 0) {
-        endGame();
-    }
-}
 
-function spawnEnemies() {
-    // for every 5 seconds, spawn an enemy
-    setInterval(function() {
-        gameObj.numOfEnemies += 1;
-        gameObj.enemiesPos.x.push(Math.random() * window.innerWidth);
-        gameObj.enemiesPos.y.push(Math.random() * window.innerHeight);
-    }, gameObj.enemySpawnInterval);
+    if (playerObj.score >= 1) {
+        upgradeLivesBtn.style.disabled = false; // Enable the button
+        upgradeLivesBtn.style.backgroundColor = '#4CAF5';
+    } else {
+        upgradeLivesBtn.style.disabled = true; // Disable the button
+        upgradeLivesBtn.style.backgroundColor = 'grey';
+        upgradeLivesBtn.style.curser = 'not-allowed';
+    }
 }
 
 
 // end game
 function endGame() {
+    clearInterval(gameInterval);
     // show game over ui
     ui.style.display = 'block';
     gameEl.style.display = 'none';
     gameoverEl.style.display = 'block';
-
-    // update game over stats
-    gameoverScoreStat.textContent = "Score: " + playerObj.score;
-    gameoverTimeStat.textContent = "Time: " + playerObj.timeSurvived.minutes.toString() + "m " + playerObj.timeSurvived.seconds + "s";
-    gameoverLivesStat.textContent = "Lives: " + playerObj.lives;
 }
 
-// player speed
-
-// enemy movement
-
-// enemy laser shooting
-
-// laser hits: collision detection
 function checkCollision() {
-    // if player is hit by enemy laser
-    // if player comes near the enemy ship
-
     // if player hits enemy ship
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
         if (playerObj.pos.x < gameObj.enemiesPos.x[i] + 150 && 
             playerObj.pos.x + 50 > gameObj.enemiesPos.x[i] && 
             playerObj.pos.y < gameObj.enemiesPos.y[i] + 150 && 
             playerObj.pos.y + 50 > gameObj.enemiesPos.y[i]) {
-            playerObj.lives -= 1;
+                if (playerObj.lives > 0) {
+                    playerObj.lives -= 1;
+                } else {
+                    endGame();
+                }
             }
     }
 }
-// game loop
-
-// play again
 
 
 /*----------- Event Listeners ----------*/
@@ -200,7 +204,7 @@ startbtn.addEventListener('click', function() {
     gameEl.style.display = 'block';
 
     // start the timer
-    setInterval(function() {
+    gameInterval = setInterval(function() {
         playerObj.timeSurvived.seconds += 1;
         updateStats();
     }, 1000);
@@ -217,74 +221,39 @@ restartbtn.addEventListener('click', function() {
     gameoverEl.style.display = 'none';
     gameEl.style.display = 'block';
 
+    // Reset game state
+    playerObj.lives = LIVES;
+    playerObj.score = SCORE = 0;
+    playerObj.timeSurvived.seconds = 0;
+    playerObj.timeSurvived.minutes = 0;
+    gameObj.numOfEnemies = 1;
+    gameObj.enemiesPos.x = [Math.random() * window.innerWidth];
+    gameObj.enemiesPos.y = [Math.random() * window.innerHeight];
+
+    // restart the game
+    clearInterval(gameInterval);  // Ensure old intervals are cleared
+    gameInterval = setInterval(function() {
+        playerObj.timeSurvived.seconds += 1;
+        updateStats();
+    }, 1000);
+
     init();
-    gammeLoop();
+
 });
-
-
-// player movement: move up, down, left, right
-// const handleMove= document.addEventListener('keydown', function(e) {
-//     // move player
-//     if (e.key === 'ArrowUp') {
-//         playerObj.pos.y -= 1
-//     }
-//     if (e.key === 'ArrowDown') {
-//         playerObj.pos.y += 1
-//     }
-//     if (e.key === 'ArrowLeft') {
-//         playerObj.pos.x -= 1
-//     }
-//     if (e.key === 'ArrowRight') {
-//         playerObj.pos.x += 1
-//     }
-//     // check if player is within bounds
-//     // update player position
-// });
-
-// // when key pressed
-// document.addEventListener('keydown', function(e) {
-//     if (e.key === 'ArrowUp') {
-//         playerObj.pos.y -= 1
-//     }
-//     if (e.key === 'ArrowDown') {
-//         playerObj.pos.y += 1
-//     }
-//     if (e.key === 'ArrowLeft') {
-//         playerObj.pos.x -= 1
-//     }
-//     if (e.key === 'ArrowRight') {
-//         playerObj.pos.x += 1
-//     }
-    
-//     // check if player is within bounds
-//     // update player position
-//     render();
-// });
-
-// // when key released
-// document.addEventListener('keyup', function(e) {
-//     switch(e.key) {
-//         case 'ArrowLeft':
-//             keys.left = false;
-//             break;
-//         case 'ArrowRight':
-//             keys.right = false;
-//             break;
-//         case 'ArrowUp':
-//             keys.up = false;
-//             break;
-//         case 'ArrowDown':
-//             keys.down = false;
-//             break;
-//     }
-// });
 
 
 // upgrades
 upgradeLivesBtn.addEventListener('click', function() {
-    if (playerObj.score >= 10 && playerObj.lives < MAX_LIVES) {
-        playerObj.lives += 1;
-        playerObj.score -= 10;
+    if (playerObj.score >= 1) {
+        LIVES += 1;
+        playerObj.lives = LIVES;
+        playerObj.score -= 1;
         updateStats();
     }
+});
+
+window.addEventListener('resize', function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    render();  
 });

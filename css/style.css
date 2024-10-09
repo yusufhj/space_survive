@@ -19,63 +19,83 @@ body {
 
 .ui {
     /* display: none; */
-    padding: 50px;
+    padding: 75px;
     margin: 100px;
     text-align: center;
-    border: 1px solid black;
-    background-color: rgba(136, 136, 136, 0.5);
+    background-color: rgba(100, 100, 100, 0.2);
     font-size: x-large;
-    z-index: 99;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
 }
 
 #game canvas {
-    background-color: rgba(59, 55, 63, 0.5);
+    background-color: rgba(100, 100, 100, 0.2);
 }
 
-#gameover_img {
-    width: 400px;
-}
 
 .gameover_ui {
     display: none;
 }
 
-/* .start_ui {
-    display: none;
-} */
+.start_ui {
+    /* display: none; */
+}
 
 #game {
     display: none;
 }
 
 #ui_title, #ui_game_over {
-    font-size: 60px;
+    font-size: 90px;
+    font-weight: bold;
+    padding: 10px;
+}
+
+#start_description {
+    font-size: 20px;
     font-weight: bold;
     padding: 10px;
 }
 
 #gameover_stats {
-    background-color: rgba(59, 55, 63, 0.5);
+    font-size: 30px;
+    font-weight: bold;
     padding: 10px;
-
+    margin: 10px;
+    text-align: center;
 }
 
-#startbtn, #restartbtn {
+#startbtn, #restartbtn, #upgrade_lives_btn {
     font-family: "Press Start 2P", system-ui;
     padding: 10px;
-    font-size: 20px;
-    background-color: #839384;
+    font-size: 30px;
     color: white;
     border: none;
     cursor: pointer;
 }
 
-#startbtn:hover, #restartbtn:hover {
+#startbtn {
+    background-color: #4CAF50;
+}
+#restartbtn {
+    background-color: #f44336;
+}
+#startbtn:hover {
+    background-color: #6b6f6b;
+}
+#restartbtn:hover {
+    background-color: #a6a6a6;
+}
+#upgrade_lives_btn {
+    background-color: #4CAF50;
+}
+
+#upgrade_lives_btn:hover {
     background-color: #6b6f6b;
 }
 
 #start_description {
     font-size: large;
     font-weight: bold;
-    padding: 20px;
+    padding: 10px;
 }
