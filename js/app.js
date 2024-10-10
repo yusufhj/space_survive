@@ -81,13 +81,13 @@ function drawCanvas() {
 
 // draw player
 function drawPlayer() {
-    ctx.drawImage(player, playerObj.pos.x, playerObj.pos.y, 30, 30);
+    ctx.drawImage(player, playerObj.pos.x-15, playerObj.pos.y-15, 30, 30);
 }
 
 // draw enemies
 function drawEnemies() {
     for (let enemyPos of gameObj.enemiesPos) {
-        ctx.drawImage(enemy, enemyPos.x, enemyPos.y, 100, 100);
+        ctx.drawImage(enemy, enemyPos.x-50, enemyPos.y-50, 100, 100);
     }
 }
 
@@ -112,28 +112,6 @@ function render() {
     // render enemies
     drawPlayer();
 }
-
-// move enemies
-// function moveEnemies() {
-//     for (let i = 0; i < gameObj.numOfEnemies; i++) {
-//         // move enemies towards mouse
-//         const enemySpeed = gameObj.enemySpeed;
-//         const dx = mouseX - gameObj.enemiesPos[i].x;
-//         const dy = mouseY - gameObj.enemiesPos[i].y;
-//         const distance = Math.sqrt(dx * dx + dy * dy);
-
-//         // Normalize the direction vector
-//         if (distance > 0) {
-//             // Normalize the dx and dy values to get direction
-//             const directionX = dx / distance;
-//             const directionY = dy / distance;
-
-//             // Update enemy position based on speed and direction
-//             gameObj.enemiesPos[i].x += directionX * enemySpeed;
-//             gameObj.enemiesPos[i].y += directionY * enemySpeed;
-//         }
-//     }
-// }
 
 // move enemies
 function moveEnemies() {
@@ -207,7 +185,7 @@ function endGame() {
 
 // check collision player with enemy
 function checkCollision() {
-    let collisonMargin = 20;
+    let collisonMargin = 100;
     // if player hits enemy ship
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
         const enemyX = gameObj.enemiesPos[i].x;
@@ -292,7 +270,7 @@ startbtn.addEventListener('click', function() {
         }
         if (playerObj.timeSurvived.seconds >= 60) {
             playerObj.timeSurvived.minutes += 1; 
-            playerObj.timeSurvived.seconds = 0; // Reset seconds after reaching 60
+            playerObj.timeSurvived.seconds = 0;
         }
         updateStats();
         moveEnemies();
