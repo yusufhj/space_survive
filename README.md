@@ -55,3 +55,5 @@ Welcome to the **Spaceship Survival**! In this game, you control a spaceship try
 6. **As a player**, I want to see a win screen if I survive for 10 minutes, giving me a sense of achievement.
 7. **As a player**, I want to be able to restart the game after losing or winning, so I can play again.
 
+## The Game Link
+https://yusufhj.github.io/space_survive/
