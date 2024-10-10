@@ -20,6 +20,7 @@ const gameObj = {
     numOfEnemies: 1,
     enemiesPos: [{ x: 0, y: 0 }],
     enemySpeed: 1,
+    enemySpeedIncrement: 0.1,
     enemySpawnInterval: 5000,
 }
 
@@ -31,8 +32,10 @@ let moveEnemiesInterval;
 let spawnEnemiesInterval;
 let mouseX = 0;
 let mouseY = 0;
+
 var player = new Image();
 player.src = './assets/player.png';
+
 var enemy = new Image();
 enemy.src = './assets/spaceship.png';
 
@@ -66,6 +69,7 @@ const canvas = document.querySelector('#game_canvas');
 
 /*---------- Canvas Functions ---------*/
 
+// initialize canvas
 var ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -77,7 +81,7 @@ function drawCanvas() {
 
 // draw player
 function drawPlayer() {
-    ctx.drawImage(player, playerObj.pos.x, playerObj.pos.y, 50, 50);
+    ctx.drawImage(player, playerObj.pos.x, playerObj.pos.y, 30, 30);
 }
 
 // draw enemies
@@ -112,11 +116,13 @@ function render() {
 // move enemies
 function moveEnemies() {
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
+        // move enemies towards mouse
         const enemySpeed = gameObj.enemySpeed;
-        const dx = playerObj.pos.x - gameObj.enemiesPos[i].x;
-        const dy = playerObj.pos.y - gameObj.enemiesPos[i].y;
+        const dx = mouseX - gameObj.enemiesPos[i].x;
+        const dy = mouseY - gameObj.enemiesPos[i].y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
+        // move enemy
         if (distance > 0) {
             gameObj.enemiesPos[i].x += (dx / distance) * enemySpeed;
             gameObj.enemiesPos[i].y += (dy / distance) * enemySpeed;
@@ -124,9 +130,10 @@ function moveEnemies() {
     }
 }
 
-// spawn enemies
+// generate a random enemy position
 function generateEnemyPosition() {
     let enemyX, enemyY;
+    // randomize enemy position to spawn
     do {
         enemyX = Math.random() * (canvas.width - 150);
         enemyY = Math.random() * (canvas.height - 150);
@@ -135,6 +142,7 @@ function generateEnemyPosition() {
     return { x: enemyX, y: enemyY };
 }
 
+// spawn enemies
 function spawnEnemies() {
     const newEnemyPosition = generateEnemyPosition();
     gameObj.enemiesPos.push(newEnemyPosition);
@@ -168,17 +176,19 @@ function endGame() {
 
 }
 
+// check collision player with enemy
 function checkCollision() {
+    let collisonMargin = 20;
     // if player hits enemy ship
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
         const enemyX = gameObj.enemiesPos[i].x;
         const enemyY = gameObj.enemiesPos[i].y;
-        const enemyWidth = 100;
-        const enemyHeight = 100; 
-        const playerWidth = 50;  
-        const playerHeight = 50; 
+        const enemyWidth = 100 + collisonMargin;
+        const enemyHeight = 100 + collisonMargin; 
+        const playerWidth = 30 + collisonMargin;  
+        const playerHeight = 30 + collisonMargin; 
 
-        // Check if the player's boundaries overlap with the enemy's boundaries
+        // Check if the player's overlap with the eenemy spaceship
         if (playerObj.pos.x < enemyX + enemyWidth &&
             playerObj.pos.x + playerWidth > enemyX &&
             playerObj.pos.y < enemyY + enemyHeight &&
@@ -192,12 +202,15 @@ function checkCollision() {
     }
 }
 
+// check win condition
 function checkWinCondition() {
+    // if player survives for 10 minutes
     if (playerObj.timeSurvived.minutes >= 10) {
         winGame();
     }
 }
 
+// win game
 function winGame() {
     clearInterval(gameInterval);
     ui.style.display = 'block';
@@ -206,7 +219,7 @@ function winGame() {
     gameoverUiEl.innerHTML = "YOU WIN!";
 }
 
-
+// upgrade button
 function upgradebtn (){
     if (playerObj.score >= 1) {
         upgradeLivesBtn.disabled = false;
@@ -223,13 +236,17 @@ function upgradebtn (){
 canvas.addEventListener('mousemove', function(e) {
     var rect = canvas.getBoundingClientRect();
     
-    // Calculate new player position
-    let newX = e.clientX - rect.left - 25;
-    let newY = e.clientY - rect.top - 25;
+    // Update mouseX and mouseY
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+
+    // Calculate new player position (this can remain if you want the player to follow mouse as well)
+    let newX = mouseX - 25;
+    let newY = mouseY - 25; 
     
     // Constrain player within canvas
-    const shipWidth = 50;  
-    const shipHeight = 50; 
+    const shipWidth = 30;  
+    const shipHeight = 30; 
     
     if (newX < 0) newX = 0;
     if (newX + shipWidth > canvas.width) newX = canvas.width - shipWidth;
@@ -252,7 +269,8 @@ startbtn.addEventListener('click', function() {
 
     // start the timer
     gameInterval = setInterval(function() {
-        playerObj.timeSurvived.seconds++; // Increase seconds by 1 each second
+        playerObj.timeSurvived.seconds++;
+        gameObj.enemySpeed += gameObj.enemySpeedIncrement;
         if (playerObj.timeSurvived.seconds === 30 || playerObj.timeSurvived.seconds === 60) {
             playerObj.score += 1;
         }
@@ -287,12 +305,11 @@ restartbtn.addEventListener('click', function() {
     gameObj.enemySpeed = 1;
     gameObj.enemySpawnInterval = 5000;
 
-    spawnEnemies();
-
     // restart the game
     clearInterval(gameInterval); 
     gameInterval = setInterval(function() {
         playerObj.timeSurvived.seconds++;
+        gameObj.enemySpeed += gameObj.enemySpeedIncrement;
         if (playerObj.timeSurvived.seconds === 30 || playerObj.timeSurvived.seconds === 60) {
             playerObj.score += 1;
         }
