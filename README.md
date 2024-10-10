@@ -3,13 +3,13 @@
 
 ## GAME SKETCH
 ### Start Page
-![alt text](start.png)
+![alt text](./plan/start.png)
 
 ### In-Game Page
-![alt text](ingame.png)
+![alt text](./plan/ingame.png)
 
 ### Game Over Page
-![alt text](over.png)
+![alt text](./plan/over.png)
 
 
 ## USER STORIES
