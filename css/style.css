@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 body {
-    /* background-image: url('/assets/bg.gif'); */
+    /* background-image: url('../assets/bg.gif'); */
     background-image: url('../assets/bgbk.jpg');
     background-size: cover;
     font-family: "Press Start 2P", system-ui;
