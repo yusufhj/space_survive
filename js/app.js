@@ -114,32 +114,60 @@ function render() {
 }
 
 // move enemies
+// function moveEnemies() {
+//     for (let i = 0; i < gameObj.numOfEnemies; i++) {
+//         // move enemies towards mouse
+//         const enemySpeed = gameObj.enemySpeed;
+//         const dx = mouseX - gameObj.enemiesPos[i].x;
+//         const dy = mouseY - gameObj.enemiesPos[i].y;
+//         const distance = Math.sqrt(dx * dx + dy * dy);
+
+//         // Calculate normalized direction
+//         if (distance > 0) {
+//             const normalizedDx = dx / distance;
+//             const normalizedDy = dy / distance;
+
+//             // Adjust the enemy position using normalized direction multiplied by speed
+//             gameObj.enemiesPos[i].x += normalizedDx * enemySpeed;
+//             gameObj.enemiesPos[i].y += normalizedDy * enemySpeed;
+
+//             // Prevent enemy from overshooting the target
+//             const newDistance = Math.sqrt(Math.pow(mouseX - gameObj.enemiesPos[i].x, 2) + Math.pow(mouseY - gameObj.enemiesPos[i].y, 2));
+//             if (newDistance < enemySpeed) {
+//                 gameObj.enemiesPos[i].x = mouseX;
+//                 gameObj.enemiesPos[i].y = mouseY;
+//             }
+//         }
+//     }
+// }
 function moveEnemies() {
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
-        // move enemies towards mouse
-        const enemySpeed = gameObj.enemySpeed;
-        const dx = mouseX - gameObj.enemiesPos[i].x;
-        const dy = mouseY - gameObj.enemiesPos[i].y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        // Calculate normalized direction
-        if (distance > 0) {
-            const normalizedDx = dx / distance;
-            const normalizedDy = dy / distance;
-
-            // Adjust the enemy position using normalized direction multiplied by speed
-            gameObj.enemiesPos[i].x += normalizedDx * enemySpeed;
-            gameObj.enemiesPos[i].y += normalizedDy * enemySpeed;
-
-            // Prevent enemy from overshooting the target
-            const newDistance = Math.sqrt(Math.pow(mouseX - gameObj.enemiesPos[i].x, 2) + Math.pow(mouseY - gameObj.enemiesPos[i].y, 2));
-            if (newDistance < enemySpeed) {
-                gameObj.enemiesPos[i].x = mouseX;
-                gameObj.enemiesPos[i].y = mouseY;
-            }
-        }
+      // Calculate remaining distance
+      const dx = mouseX - gameObj.enemiesPos[i].x;
+      const dy = mouseY - gameObj.enemiesPos[i].y;
+      const distanceToMouse = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+  
+      // Calculate normalized direction
+      const normalizedDx = dx / distanceToMouse;
+      const normalizedDy = dy / distanceToMouse;
+  
+      // Limit movement based on distance
+      const enemySpeed = gameObj.enemySpeed;
+      const movementAmount = Math.min(distanceToMouse, enemySpeed);
+      const newDx = normalizedDx * movementAmount;
+      const newDy = normalizedDy * movementAmount;
+  
+      // Update enemy position
+      gameObj.enemiesPos[i].x += newDx;
+      gameObj.enemiesPos[i].y += newDy;
+  
+      // Prevent overshooting (optional)
+      if (distanceToMouse < enemySpeed) {
+        gameObj.enemiesPos[i].x = mouseX;
+        gameObj.enemiesPos[i].y = mouseY;
+      }
     }
-}
+  }
 
 // generate a random enemy position
 function generateEnemyPosition() {
