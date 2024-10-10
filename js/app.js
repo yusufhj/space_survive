@@ -19,16 +19,16 @@ const playerObj = {
 const gameObj = {
     numOfEnemies: 1,
     enemiesPos: [{ x: 0, y: 0 }],
-    shootingInterval: 1000,
     enemySpeed: 1,
     enemySpawnInterval: 5000,
-    lasers: []
 }
 
 
 /*---------- Variables (state) ---------*/
 
 let gameInterval;
+let moveEnemiesInterval;
+let spawnEnemiesInterval;
 let mouseX = 0;
 let mouseY = 0;
 var player = new Image();
@@ -60,6 +60,7 @@ const startEl = document.querySelector('#start_ui');
 const gameoverEl = document.querySelector('#gameover_ui');
 const gameEl = document.querySelector('#game');
 const ui = document.querySelector('.ui');
+const gameoverUiEl = document.querySelector('#ui_game_over');
 
 const canvas = document.querySelector('#game_canvas');
 
@@ -76,25 +77,27 @@ function drawCanvas() {
 
 // draw player
 function drawPlayer() {
-    ctx.drawImage(player, playerObj.pos.x, playerObj.pos.y, 20, 20);
+    ctx.drawImage(player, playerObj.pos.x, playerObj.pos.y, 50, 50);
 }
 
 // draw enemies
 function drawEnemies() {
     for (let enemyPos of gameObj.enemiesPos) {
-        ctx.drawImage(enemy, enemyPos.x, enemyPos.y, 50, 50);
+        ctx.drawImage(enemy, enemyPos.x, enemyPos.y, 100, 100);
     }
 }
+
 
 /*-------------- Functions -------------*/
 
 // initailize game
 function init() {
+    clearInterval(moveEnemiesInterval);
+    clearInterval(spawnEnemiesInterval);
     updateStats();
     render();
-
-    setInterval(moveEnemies, 50);
-    setInterval(spawnEnemies, gameObj.enemySpawnInterval);
+    moveEnemiesInterval = setInterval(moveEnemies, 5);
+    spawnEnemiesInterval = setInterval(spawnEnemies, gameObj.enemySpawnInterval);
 }
 
 // render
@@ -141,16 +144,6 @@ function spawnEnemies() {
 // update stats
 function updateStats() {
     livesStat.textContent = "Lives: " + playerObj.lives;
-    
-    // for every 30 seconds, increase score by one
-    if (playerObj.timeSurvived.seconds === 30) {
-        playerObj.score += 1;
-    }
-    if (playerObj.timeSurvived.seconds === 60) {
-        playerObj.score += 1;
-        playerObj.timeSurvived.minutes += 1;
-        playerObj.timeSurvived.seconds = 0;
-    }
     if (playerObj.timeSurvived.minutes >0) {
         timeStat.textContent = "Time: " + playerObj.timeSurvived.minutes.toString() + "m " + playerObj.timeSurvived.seconds + "s";
     } else {
@@ -158,16 +151,9 @@ function updateStats() {
     }
     scoreStat.textContent = "Score: " + playerObj.score;
 
+    upgradebtn();
     checkCollision();
-
-    if (playerObj.score >= 1) {
-        upgradeLivesBtn.style.disabled = false; // Enable the button
-        upgradeLivesBtn.style.backgroundColor = '#4CAF5';
-    } else {
-        upgradeLivesBtn.style.disabled = true; // Disable the button
-        upgradeLivesBtn.style.backgroundColor = 'grey';
-        upgradeLivesBtn.style.curser = 'not-allowed';
-    }
+    checkWinCondition();
 }
 
 
@@ -178,21 +164,56 @@ function endGame() {
     ui.style.display = 'block';
     gameEl.style.display = 'none';
     gameoverEl.style.display = 'block';
+    gameoverUiEl.innerHTML = "GAME OVER";
+
 }
 
 function checkCollision() {
     // if player hits enemy ship
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
-        if (playerObj.pos.x < gameObj.enemiesPos[i].x + 150 && 
-            playerObj.pos.x + 40 > gameObj.enemiesPos[i].x && 
-            playerObj.pos.y < gameObj.enemiesPos[i].y + 150 && 
-            playerObj.pos.y + 40 > gameObj.enemiesPos[i].y) {
+        const enemyX = gameObj.enemiesPos[i].x;
+        const enemyY = gameObj.enemiesPos[i].y;
+        const enemyWidth = 100;
+        const enemyHeight = 100; 
+        const playerWidth = 50;  
+        const playerHeight = 50; 
+
+        // Check if the player's boundaries overlap with the enemy's boundaries
+        if (playerObj.pos.x < enemyX + enemyWidth &&
+            playerObj.pos.x + playerWidth > enemyX &&
+            playerObj.pos.y < enemyY + enemyHeight &&
+            playerObj.pos.y + playerHeight > enemyY) {
                 if (playerObj.lives > 0) {
                     playerObj.lives -= 1;
                 } else {
                     endGame();
                 }
             }
+    }
+}
+
+function checkWinCondition() {
+    if (playerObj.timeSurvived.minutes >= 10) {
+        winGame();
+    }
+}
+
+function winGame() {
+    clearInterval(gameInterval);
+    ui.style.display = 'block';
+    gameEl.style.display = 'none';
+    gameoverEl.style.display = 'block';
+    gameoverUiEl.innerHTML = "YOU WIN!";
+}
+
+
+function upgradebtn (){
+    if (playerObj.score >= 1) {
+        upgradeLivesBtn.disabled = false;
+        upgradeLivesBtn.style.backgroundColor = '#4CAF50';
+    } else {
+        upgradeLivesBtn.disabled = true;
+        upgradeLivesBtn.style.backgroundColor = 'grey';
     }
 }
 
@@ -231,7 +252,14 @@ startbtn.addEventListener('click', function() {
 
     // start the timer
     gameInterval = setInterval(function() {
-        playerObj.timeSurvived.seconds += 1;
+        playerObj.timeSurvived.seconds++; // Increase seconds by 1 each second
+        if (playerObj.timeSurvived.seconds === 30 || playerObj.timeSurvived.seconds === 60) {
+            playerObj.score += 1;
+        }
+        if (playerObj.timeSurvived.seconds >= 60) {
+            playerObj.timeSurvived.minutes += 1; 
+            playerObj.timeSurvived.seconds = 0; // Reset seconds after reaching 60
+        }
         updateStats();
         moveEnemies();
     }, 1000);
@@ -256,12 +284,22 @@ restartbtn.addEventListener('click', function() {
 
     gameObj.numOfEnemies = 1;
     gameObj.enemiesPos = [{x: 0, y: 0}];
+    gameObj.enemySpeed = 1;
+    gameObj.enemySpawnInterval = 5000;
+
     spawnEnemies();
 
     // restart the game
     clearInterval(gameInterval); 
     gameInterval = setInterval(function() {
-        playerObj.timeSurvived.seconds += 1;
+        playerObj.timeSurvived.seconds++;
+        if (playerObj.timeSurvived.seconds === 30 || playerObj.timeSurvived.seconds === 60) {
+            playerObj.score += 1;
+        }
+        if (playerObj.timeSurvived.seconds >= 60) {
+            playerObj.timeSurvived.minutes += 1; 
+            playerObj.timeSurvived.seconds = 0; 
+        }
         updateStats();
         moveEnemies();
     }, 1000);
@@ -278,6 +316,7 @@ upgradeLivesBtn.addEventListener('click', function() {
         playerObj.score -= 1;
         updateStats();
     }
+    upgradebtn();
 });
 
 window.addEventListener('resize', function() {
