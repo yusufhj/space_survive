@@ -114,21 +114,50 @@ function render() {
 }
 
 // move enemies
+// function moveEnemies() {
+//     for (let i = 0; i < gameObj.numOfEnemies; i++) {
+//         // move enemies towards mouse
+//         const enemySpeed = gameObj.enemySpeed;
+//         const dx = mouseX - gameObj.enemiesPos[i].x;
+//         const dy = mouseY - gameObj.enemiesPos[i].y;
+//         const distance = Math.sqrt(dx * dx + dy * dy);
+
+//         // Normalize the direction vector
+//         if (distance > 0) {
+//             // Normalize the dx and dy values to get direction
+//             const directionX = dx / distance;
+//             const directionY = dy / distance;
+
+//             // Update enemy position based on speed and direction
+//             gameObj.enemiesPos[i].x += directionX * enemySpeed;
+//             gameObj.enemiesPos[i].y += directionY * enemySpeed;
+//         }
+//     }
+// }
+
+// move enemies
 function moveEnemies() {
     for (let i = 0; i < gameObj.numOfEnemies; i++) {
-        // move enemies towards mouse
-        const enemySpeed = gameObj.enemySpeed;
-        const dx = mouseX - gameObj.enemiesPos[i].x;
-        const dy = mouseY - gameObj.enemiesPos[i].y;
+        // Get enemy's position
+        const enemyPos = gameObj.enemiesPos[i];
+
+        // Calculate direction towards the mouse
+        const dx = mouseX - enemyPos.x;
+        const dy = mouseY - enemyPos.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // move enemy
+        // Normalize the direction vector
         if (distance > 0) {
-            gameObj.enemiesPos[i].x += (dx / distance) * enemySpeed;
-            gameObj.enemiesPos[i].y += (dy / distance) * enemySpeed;
+            const directionX = dx / distance;
+            const directionY = dy / distance;
+
+            // Move enemy based on speed and direction
+            enemyPos.x += directionX * gameObj.enemySpeed;
+            enemyPos.y += directionY * gameObj.enemySpeed;
         }
     }
 }
+
 
 // generate a random enemy position
 function generateEnemyPosition() {
@@ -240,22 +269,9 @@ canvas.addEventListener('mousemove', function(e) {
     mouseX = e.clientX - rect.left;
     mouseY = e.clientY - rect.top;
 
-    // Calculate new player position (this can remain if you want the player to follow mouse as well)
-    let newX = mouseX - 25;
-    let newY = mouseY - 25; 
-    
-    // Constrain player within canvas
-    const shipWidth = 30;  
-    const shipHeight = 30; 
-    
-    if (newX < 0) newX = 0;
-    if (newX + shipWidth > canvas.width) newX = canvas.width - shipWidth;
-    if (newY < 0) newY = 0;
-    if (newY + shipHeight > canvas.height) newY = canvas.height - shipHeight;
-
     // Update player position
-    playerObj.pos.x = newX;
-    playerObj.pos.y = newY;
+    playerObj.pos.x = mouseX;
+    playerObj.pos.y = mouseY;
 
     render();
 });
